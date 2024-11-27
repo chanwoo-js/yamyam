@@ -5,18 +5,18 @@ public class ResponseMessage {
     public static final String SUCCESS = "Success"; // 성공 시 반환 메시지
     public static final String VALIDATION_FAIL = "Validation failed."; // 유효성 검사 실패 시 반환 메시지
 
-    public static final String INVALID_USER_ID = "Invalid user id.";
-    public static final String INVALID_PASSWORD = "Invalid password.";
-    public static final String INVALID_NAME = "Invalid name.";
-    public static final String INVALID_EMAIL = "Invalid email.";
-    public static final String INVALID_PHONE = "Invalid phone.";
-    public static final String WEAK_PASSWORD = "Weak password.";
+    public static final String INVALID_USER_ID = "Invalid user id."; // 잘못된 사용자 ID일 때 반환 메시지
+    public static final String INVALID_PASSWORD = "Invalid password."; // 잘못된 비밀번호일 때 반환 메시지
+    public static final String INVALID_NAME = "Invalid name."; // 잘못된 이름일 때 반환 메시지
+    public static final String INVALID_EMAIL = "Invalid email."; // 잘못된 이메일일 때 반환 메시지
+    public static final String INVALID_PHONE = "Invalid phone."; // 잘못된 전화번호일 때 반환 메시지
+    public static final String WEAK_PASSWORD = "Weak password."; // 비밀번호가 약할 때 반환 메시지
 
-    public static final String DATABASE_ERROR = "Database error."; // 데이터베이스 에러 시 반환 메시지
+    public static final String DATABASE_ERROR = "Database error."; // 데이터베이스 오류 시 반환 메시지
 
     // 존재 여부 관련 메시지
     public static final String EXIST_DATA = "Data already exists."; // 데이터가 이미 존재할 때 반환 메시지
-
+    public static final String NOT_EXIST_STORE = "Store does not exist"; // 가게가 존재하지 않을 때 반환 메시지
     public static final String NOT_EXIST_DATA = "Data does not exist."; // 데이터가 존재하지 않을 때 반환 메시지
     public static final String NOT_EXIST_USER = "User does not exist."; // 사용자가 존재하지 않을 때 반환 메시지
     public static final String NOT_EXIST_MENU = "Menu does not exist."; // 메뉴가 존재하지 않을 때 반환 메시지
@@ -30,8 +30,9 @@ public class ResponseMessage {
 
     // 중복 관련 메시지
     // : 중복될 수 없는 값에 대한 응답 메시지
-    public static final String DUPLICATED_USER_ID = "Duplicated user ID."; // 사용자 ID 중복 시 반환 메시지
-    public static final String DUPLICATED_TEL_NUMBER = "Duplicated telephone number."; // 전화번호 중복 시 반환 메시지
+    public static final String DUPLICATED_USER_ID = "Duplicated user ID."; // 사용자 ID가 중복될 때 반환 메시지
+    public static final String DUPLICATED_USER_BUSINESS_NUMBER = "Duplicated user business number."; // 사용자 ID가 중복될 때 반환 메시지
+    public static final String DUPLICATED_TEL_NUMBER = "Duplicated telephone number."; // 전화번호가 중복될 때 반환 메시지
 
     // 인증 및 권한 관련 메시지
     public static final String SIGN_IN_FAIL = "Sign in failed."; // 로그인 실패 시 반환 메시지
@@ -42,5 +43,5 @@ public class ResponseMessage {
 
     // 토큰 및 메시지 관련 에러
     public static final String TOKEN_CREATE_FAIL = "Token creation failed."; // 토큰 생성 실패 시 반환 메시지
-    public static final String MESSAGE_SEND_FAIL = "Failed to send authentication number.";
+    public static final String MESSAGE_SEND_FAIL = "Failed to send authentication number."; // 인증번호 전송 실패 시 반환 메시지
 }

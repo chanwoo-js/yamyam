@@ -21,6 +21,10 @@ import * as css from "./Styles";
 import axios from "axios";
 
 function SignUp() {
+  const navigate = useNavigate();
+  const handleGoBack = () => {
+    navigate(-1);
+  };
   const [userSignUpInfo, setUserSignUpInfo] = useState<UserSignUpInfo>({
     userId: "",
     userPw: "",
@@ -33,7 +37,7 @@ function SignUp() {
     marketingAgreed: false,
   });
 
-  const [errors, setErrors] = useState<Errors>({
+  const [errorsMsg, setErrorsMsg] = useState<Errors>({
     userId: "",
     userPw: "",
     checkPw: "",
@@ -41,9 +45,13 @@ function SignUp() {
     userEmail: "",
     userPhone: "",
     userBusinessNumber: "",
-    privacyPolicyAgreed: false,
-    marketingAgreed: false,
     form: "",
+  });
+
+  const [successMsg, setSuccessMsg] = useState({
+    userId: "",
+    checkPw: "",
+    userBusinessNumber: "",
   });
 
   const [slideState, setSlideState] = useState({
@@ -51,13 +59,66 @@ function SignUp() {
     marketingAgreed: false,
   });
 
-  const navigate = useNavigate();
-
-  const handleGoBack = () => {
-    navigate(-1);
+  const userIdDuplicationCheck = async () => {
+    const userIdRegex = /^(?=.*[a-z])(?=.*\d)[a-z\d]{4,20}$/;
+    if (!userIdRegex.test(userSignUpInfo.userId)) {
+      return;
+    } else {
+      try {
+        const response = await axios.post(
+          `http://localhost:4041/api/v1/auth/signUp/search/userId`,
+          { userId: userSignUpInfo.userId }
+        );
+        if (response.data.data.duplicatedStatus) {
+          setSuccessMsg((prev) => ({
+            ...prev,
+            userId: "사용 가능한 아이디 입니다.",
+          }));
+        } else {
+          setErrorsMsg((prev) => ({
+            ...prev,
+            userId: "이미 사용 중인 아이디입니다.",
+          }));
+        }
+      } catch (error) {
+        setErrorsMsg((prev) => ({
+          ...prev,
+          form: `${error}`,
+        }));
+      }
+    }
   };
 
+  const userBusinessNumberDuplicationCheck = async () => {
+    const businessNumberRegex = /^\d{10}$/;
+    if (!businessNumberRegex.test(userSignUpInfo.userBusinessNumber)) {
+      return;
+    }
+    try {
+      const response = await axios.post(
+        `http://localhost:4041/api/v1/auth/signUp/search/userBusinessNumber`,
+        { userBusinessNumber: userSignUpInfo.userBusinessNumber }
+      );
+      if (response.data.data.duplicatedStatus) {
+        setSuccessMsg((prev) => ({
+          ...prev,
+          userBusinessNumber: "사용 가능한 사업자 번호입니다.",
+        }));
+      } else {
+        setErrorsMsg((prev) => ({
+          ...prev,
+          userBusinessNumber: "이미 사용 중인 사업자 번호입니다.",
+        }));
+      }
+    } catch (error) {
+      setErrorsMsg((prev) => ({
+        ...prev,
+        form: `${error}`,
+      }));
+    }
+  };
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
     const { name, value } = e.target;
 
     setUserSignUpInfo((prev) => ({
@@ -67,16 +128,22 @@ function SignUp() {
 
     let errorMsg = "";
 
+    setSuccessMsg((prev) => ({
+      ...prev,
+      userId: "",
+      userBusinessNumber: "",
+    }));
+
     switch (name) {
       case "userId":
         const userIdRegex = /^(?=.*[a-z])(?=.*\d)[a-z\d]{4,20}$/;
         if (!userIdRegex.test(value)) {
-          errorMsg =
-            "아이디는 영문과 숫자를 조합하여 4자 이상 20자 이하로 입력해주세요.";
+          errorMsg = "영문과 숫자를 조합하여 4 ~ 20자 사이로 입력해주세요.";
         }
         break;
       case "userPw":
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[^\s]{8,15}$/;
+        const passwordRegex =
+          /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[^\s]{8,15}$/;
         if (!passwordRegex.test(value)) {
           errorMsg =
             "비밀번호는 영문자, 숫자, 특수문자를 포함하여 10자 이상 입력해주세요.";
@@ -85,6 +152,15 @@ function SignUp() {
       case "checkPw":
         if (value !== userSignUpInfo.userPw) {
           errorMsg = "비밀번호가 일치하지 않습니다.";
+        } else if (value === userSignUpInfo.userPw) {
+          setSuccessMsg((prev) => ({
+            ...prev,
+            checkPw: "비밀번호가 일치합니다.",
+          }));
+          setErrorsMsg((prev) => ({
+            ...prev,
+            [name]: "",
+          }));
         }
         break;
       case "userName":
@@ -113,21 +189,21 @@ function SignUp() {
         break;
       case "privacyPolicyAgreed":
         const privacyPolicyAgreementRegex = /^(true|false)$/;
-        if(!privacyPolicyAgreementRegex.test(value)){
+        if (!privacyPolicyAgreementRegex.test(value)) {
           errorMsg = "개인정보 동의에 유효한 값을 넣어주세요.";
         }
         break;
       case "marketingAgreed":
         const marketingAgreedRegex = /^(true|false)$/;
-        if(!marketingAgreedRegex.test(value)){
-          errorMsg = "마케팅 동의에 유효한 값을 넣어주세요."
+        if (!marketingAgreedRegex.test(value)) {
+          errorMsg = "마케팅 동의에 유효한 값을 넣어주세요.";
         }
         break;
       default:
         break;
     }
 
-    setErrors((prev) => ({
+    setErrorsMsg((prev) => ({
       ...prev,
       [name]: errorMsg,
     }));
@@ -149,21 +225,16 @@ function SignUp() {
       [item]: !prev[item],
     }));
   };
-
-  const submitCheckButton = () => {
-    
-  }
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const Errors = Object.values(errors).some((error) => error);
-
-    if (Errors) {
-      setErrors((prev) => ({
-        ...prev,
-        form: "입력한 정보를 다시 확인해주세요.",
-      }));
-      return;
-    }
+    const hasErrors =
+    Object.entries(errorsMsg).some(([key, msg]) => key !== "form" && msg !== "") ||
+    userSignUpInfo.privacyPolicyAgreed === false;
+  if (hasErrors) {
+    setErrorsMsg((prev) => ({ ...prev, form: "Errors in errorText" }));
+    return;
+  }
 
     try {
       const response = await axios.post(
@@ -171,39 +242,53 @@ function SignUp() {
         userSignUpInfo
       );
       if (response.data.data) {
-        console.log("회원가입에 성공했습니다.");
         navigate("/logIn");
       } else {
-        setErrors((prev) => ({ ...prev, form: "회원가입에 실패했습니다." }));
+        setErrorsMsg((prev) => ({ ...prev, form: "회원가입에 실패했습니다." }));
       }
-      console.log(response.data.data);
     } catch (error) {
-      setErrors((prev) => ({ ...prev, form: "서버 오류가 발생했습니다." }));
+      setErrorsMsg((prev) => ({ ...prev, form: "서버 오류가 발생했습니다." }));
     }
+    return;
   };
   return (
     <>
       <h2 css={css.signUpTitle}>회원가입</h2>
       <Box css={css.formStyle} component="form">
-        <TextField
-          label="아아디"
-          type="text"
-          name="userId"
-          variant="outlined"
-          value={userSignUpInfo.userId}
-          onChange={handleInputChange}
-          error={!!errors?.userId}
-          helperText={errors?.userId}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <PermIdentityIcon />
-                </InputAdornment>
-              ),
+        <Box
+          css={css.duplicatedContainer}
+          sx={{
+            "&:nth-of-type(1)": {
+              marginBottom:
+                errorsMsg.userId || successMsg.userId ? "40px" : "20px",
             },
           }}
-        />
+        >
+          <TextField
+            label="아아디"
+            type="text"
+            name="userId"
+            variant="outlined"
+            value={userSignUpInfo.userId}
+            onChange={handleInputChange}
+            error={!!errorsMsg?.userId}
+            helperText={
+              successMsg.userId ? successMsg?.userId : errorsMsg?.userId
+            }
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PermIdentityIcon />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+          <Button onClick={userIdDuplicationCheck} variant="outlined">
+            중복 확인
+          </Button>
+        </Box>
         <TextField
           label="비밀번호"
           type="password"
@@ -211,8 +296,8 @@ function SignUp() {
           variant="outlined"
           value={userSignUpInfo.userPw}
           onChange={handleInputChange}
-          error={!!errors?.userPw}
-          helperText={errors?.userPw}
+          error={!!errorsMsg?.userPw}
+          helperText={errorsMsg?.userPw}
           slotProps={{
             input: {
               startAdornment: (
@@ -230,8 +315,12 @@ function SignUp() {
           variant="outlined"
           value={userSignUpInfo.checkPw}
           onChange={handleInputChange}
-          error={!!errors?.checkPw}
-          helperText={errors?.checkPw}
+          error={!!errorsMsg?.checkPw}
+          helperText={
+            userSignUpInfo.userPw === userSignUpInfo.checkPw
+              ? successMsg.checkPw
+              : errorsMsg?.checkPw
+          }
           slotProps={{
             input: {
               startAdornment: (
@@ -249,8 +338,8 @@ function SignUp() {
           variant="outlined"
           value={userSignUpInfo.userName}
           onChange={handleInputChange}
-          error={!!errors?.userName}
-          helperText={errors?.userName}
+          error={!!errorsMsg?.userName}
+          helperText={errorsMsg?.userName}
           slotProps={{
             input: {
               startAdornment: (
@@ -268,8 +357,8 @@ function SignUp() {
           variant="outlined"
           value={userSignUpInfo.userEmail}
           onChange={handleInputChange}
-          error={!!errors?.userEmail}
-          helperText={errors?.userEmail}
+          error={!!errorsMsg?.userEmail}
+          helperText={errorsMsg?.userEmail}
           slotProps={{
             input: {
               startAdornment: (
@@ -287,8 +376,8 @@ function SignUp() {
           variant="outlined"
           value={userSignUpInfo.userPhone}
           onChange={handleInputChange}
-          error={!!errors?.userPhone}
-          helperText={errors?.userPhone}
+          error={!!errorsMsg?.userPhone}
+          helperText={errorsMsg?.userPhone}
           slotProps={{
             input: {
               startAdornment: (
@@ -299,27 +388,47 @@ function SignUp() {
             },
           }}
         />
-        <TextField
-          label="사업자 번호( - 제외하고 입력)"
-          type="text"
-          name="userBusinessNumber"
-          variant="outlined"
-          value={userSignUpInfo.userBusinessNumber}
-          onChange={handleInputChange}
-          error={!!errors?.userBusinessNumber}
-          helperText={errors?.userBusinessNumber}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <StorefrontOutlinedIcon />
-                </InputAdornment>
-              ),
+        <Box css={css.duplicatedContainer}>
+          <TextField
+            label="사업자 번호( - 제외하고 입력)"
+            type="text"
+            name="userBusinessNumber"
+            variant="outlined"
+            value={userSignUpInfo.userBusinessNumber}
+            onChange={handleInputChange}
+            error={!!errorsMsg?.userBusinessNumber}
+            helperText={
+              successMsg.userBusinessNumber
+                ? successMsg.userBusinessNumber
+                : errorsMsg?.userBusinessNumber
+            }
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <StorefrontOutlinedIcon />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+          <Button
+            onClick={userBusinessNumberDuplicationCheck}
+            variant="outlined"
+          >
+            중복 확인
+          </Button>
+        </Box>
+        <Box
+          sx={{
+            "&": {
+              marginTop:
+                errorsMsg.userBusinessNumber || successMsg.userBusinessNumber
+                  ? "18px"
+                  : "0px",
             },
           }}
-        />
-
-        <Box>
+        >
           <FormControlLabel
             control={
               <Checkbox
@@ -362,7 +471,7 @@ function SignUp() {
 
         <Box>
           <Button
-            css={css.button}
+            css={css.submitButton}
             type="submit"
             onClick={handleSubmit}
             variant="contained"
@@ -370,10 +479,11 @@ function SignUp() {
           >
             가입하기
           </Button>
-          <Button 
-            css={css.button}
-            variant="outlined" 
-            onClick={handleGoBack}>
+          <Button
+            css={css.submitButton}
+            variant="outlined"
+            onClick={handleGoBack}
+          >
             뒤로가기
           </Button>
         </Box>

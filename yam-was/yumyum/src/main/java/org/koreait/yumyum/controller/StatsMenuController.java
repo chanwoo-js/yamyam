@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(ApiMappingPattern.STAT) // /api/v1/stats;
+@RequestMapping(ApiMappingPattern.STATS) // /api/v1/stats;
 public class StatsMenuController {
 
     private final StatsMenuService statsMenuService;

@@ -18,7 +18,6 @@ export interface Errors {
   userEmail : string; // 이메일
   userPhone : string; // 휴대폰 번호
   userBusinessNumber : string; // 사업자 번호
-  privacyPolicyAgreed : boolean; // 개인정보 동의/비동의
-  marketingAgreed : boolean; // 마케팅 수신 동의/ 비동의
   form?: string; // 전체 폼 오류 메세지 (ex 서버 오류 등)
 }
+

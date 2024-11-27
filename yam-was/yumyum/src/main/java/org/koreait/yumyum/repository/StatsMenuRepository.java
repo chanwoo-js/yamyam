@@ -17,7 +17,7 @@ public interface StatsMenuRepository extends JpaRepository<OrderDetail, Long> {
             "AND MONTH(O.orderDate) = :month " +
             "AND DAY(O.orderDate) = :day " +
             "GROUP BY OD.orderProductName ")
-    List<Object[]> findDailySales(@Param("year") int year,
-                                  @Param("month") int month,
-                                  @Param("day") int day);
+    List<Object[]> findMenuDailySales(@Param("year") int year,
+                                      @Param("month") int month,
+                                      @Param("day") int day);
 }

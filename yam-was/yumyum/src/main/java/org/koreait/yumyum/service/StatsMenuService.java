@@ -23,7 +23,7 @@ public class StatsMenuService {
 
         try {
             LocalDate localDate = LocalDate.parse(date);
-            List<Object[]> dailySales = statsMenuRepository.findDailySales(
+            List<Object[]> dailySales = statsMenuRepository.findMenuDailySales(
                     localDate.getYear(),
                     localDate.getMonthValue(),
                     localDate.getDayOfMonth()
