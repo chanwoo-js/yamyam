@@ -3,6 +3,7 @@ import React from "react";
 import "./App.css";
 import {Route, Routes} from "react-router-dom";
 import {
+    AUTH_PATH_SIGN_UP,
     CONTACT_PATH,
     MENU_PATH,
     REVIEW_PATH,
@@ -25,6 +26,7 @@ import UserMyPage from "./views/UserMyPage/UserMyPage";
 import Contact from "./views/Contact/Contact";
 import * as css from "./Styles/MainStyle";
 import Main from "./views/Main/Main";
+import SignUp from "./views/Authentication/SignUp/SignUp";
 
 
 function App() {
@@ -46,6 +48,7 @@ function App() {
                         <Route path={REVIEW_PATH} element={<Review/>}></Route>
                         <Route path={USER_MY_PAGE_PATH} element={<UserMyPage />}></Route>
                         <Route path={CONTACT_PATH} element={<Contact/>}></Route>
+                        <Route path={AUTH_PATH_SIGN_UP} element={<SignUp/>}></Route>
                     </Routes>
                 </main>
             </div>

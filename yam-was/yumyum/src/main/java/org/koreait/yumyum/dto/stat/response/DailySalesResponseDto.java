@@ -10,6 +10,4 @@ import java.time.LocalDate;
 public class DailySalesResponseDto {
     private LocalDate orderDay;
     private int dailySales;
-
-
 }

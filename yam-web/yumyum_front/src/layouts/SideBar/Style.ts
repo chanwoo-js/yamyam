@@ -13,6 +13,10 @@ export const categoryContainer = css`
 
     & > nav > ul > li {
         margin-bottom: 10px;
+        transition: transform 0.2s ease;
+    }
+    & > nav > ul > li:hover {
+        transform: scale(1.05);
     }
 
     & > nav > ul > li > a {
